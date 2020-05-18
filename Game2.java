@@ -11,6 +11,7 @@ import java.awt.image.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.*;
+import java.util.Random;
 
 
 
@@ -21,14 +22,14 @@ public class Game2 extends JPanel implements ActionListener{
     private int snakeBodyX[] = new int[50];
     private int snakeBodyY[] = new int[50];
     private int snakeLength;
-    public int snakeSize = 50;
+    public int snakeSize = 10;
+
+    private int appleX;
+    private int appleY;
 
     private ImageIcon b;
     private ImageIcon h;
-    private Image bodyImage;
-    private Image headImage;
-    private Image resizedBodyImage;
-    private Image resizedHeadImage;
+    private ImageIcon a;
 
     private Timer timer;
 
@@ -45,7 +46,7 @@ public class Game2 extends JPanel implements ActionListener{
         setFocusable(true);
         setBackground(Color.black);
         height = 800;
-        width = 800;
+        width = 400;
         snakeLength = 5;
         snakeBodyX[0] = 300;  //head x
         snakeBodyY[0] = 300;  //head y
@@ -58,16 +59,22 @@ public class Game2 extends JPanel implements ActionListener{
         snakeBodyX[4] = 260;  //tail x
         snakeBodyY[4] = 300;  //tail y
 
+        LocateApple();
+
         b = new ImageIcon("D:\\project\\body2.png");
         h = new ImageIcon("D:\\project\\head2.png");
+        a = new ImageIcon("D:\\project\\apple.png");
+        Image tempA = a.getImage();
         Image tempH = h.getImage();
         Image tempB = b.getImage();
         tempH = tempH.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
         tempB = tempB.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
+        tempA = tempA.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
         h = new ImageIcon(tempH);
         b = new ImageIcon(tempB);
+        a = new ImageIcon(tempA);
 
-        timer = new Timer(140,this);
+        timer = new Timer(280,this);
         timer.start();
         timer.addActionListener(this);
         inGame = true;
@@ -77,7 +84,25 @@ public class Game2 extends JPanel implements ActionListener{
         right = false;
     }   
 
+    public void LocateApple(){
+        System.out.println(appleX);
+        System.out.println(appleY);
+        Random rnd = new Random();
+        appleX = rnd.nextInt(40);
+        appleY = rnd.nextInt(80);
+        System.out.println("Apple X = " + appleX);
+        System.out.println("Apple Y = " + appleY);
+        appleX *= snakeSize;
+        appleY *= snakeSize;
+    }
     
+    public void checkAppleEaten(){
+        System.out.println("Apple x = "+ appleX);
+        if ((snakeBodyX[0] == appleX) && (snakeBodyY[0] == appleY)){
+            LocateApple();
+            snakeLength++;
+        }
+    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -87,6 +112,8 @@ public class Game2 extends JPanel implements ActionListener{
     }
 
     public void doDrawing(Graphics g){
+        
+        a.paintIcon(this, g, appleX, appleY);
         int length = snakeLength;
         System.out.println("UP: "+up);
         System.out.println("DOWN: "+down);
@@ -131,26 +158,34 @@ public class Game2 extends JPanel implements ActionListener{
     }
 
     public void checkWall(){
-        if (snakeBodyX[0] >= height){
-            inGame = false;
-        }
-        else if (snakeBodyX[0] <= 0){
-            inGame = false;
-        }
-        else if (snakeBodyY[0] >= width){
+        if (snakeBodyY[0] >= height){
             inGame = false;
         }
         else if (snakeBodyY[0] <= 0){
             inGame = false;
         }
+        else if (snakeBodyX[0] >= width){
+            inGame = false;
+        }
+        else if (snakeBodyX[0] <= 0){
+            inGame = false;
+        }
+        if (inGame == true){
+            System.out.println("False");
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        movement();
-        checkWall();
-        System.out.println("I did @@@@@@@@@@@@@@@@@@");
-        repaint();
+        if(inGame){
+            movement();
+            checkWall();
+            repaint(); 
+            checkAppleEaten();
+        }
+        if(!inGame){
+            timer.stop();
+        }
     }
     private class TAdapter extends KeyAdapter {
 
