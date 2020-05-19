@@ -17,6 +17,9 @@ import java.util.Random;
 
 public class Game2 extends JPanel implements ActionListener{
 
+    public int count = 0;
+    public int speed = 300;
+
     private int height;
     private int width;
     private int snakeBodyX[] = new int[50];
@@ -74,14 +77,13 @@ public class Game2 extends JPanel implements ActionListener{
         b = new ImageIcon(tempB);
         a = new ImageIcon(tempA);
 
-        timer = new Timer(280,this);
+        timer = new Timer(speed,this);
         timer.start();
-        timer.addActionListener(this);
         inGame = true;
         up = false;
         down = false;
-        left = true;
-        right = false;
+        left = false;
+        right = true;
     }   
 
     public void LocateApple(){
@@ -90,14 +92,11 @@ public class Game2 extends JPanel implements ActionListener{
         Random rnd = new Random();
         appleX = rnd.nextInt(40);
         appleY = rnd.nextInt(80);
-        System.out.println("Apple X = " + appleX);
-        System.out.println("Apple Y = " + appleY);
         appleX *= snakeSize;
         appleY *= snakeSize;
     }
     
     public void checkAppleEaten(){
-        System.out.println("Apple x = "+ appleX);
         if ((snakeBodyX[0] == appleX) && (snakeBodyY[0] == appleY)){
             LocateApple();
             snakeLength++;
@@ -107,52 +106,49 @@ public class Game2 extends JPanel implements ActionListener{
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        System.out.println("I did painting\n\n");
         doDrawing(g);
     }
 
     public void doDrawing(Graphics g){
-        
+        System.out.println();
+        System.out.println("Apple X = " + appleX);
+        System.out.println("Apple Y = " + appleY);
         a.paintIcon(this, g, appleX, appleY);
         int length = snakeLength;
-        System.out.println("UP: "+up);
-        System.out.println("DOWN: "+down);
-        System.out.println("LEFT: "+left);
-        System.out.println("RIGHT: "+right);
         for(int i = 0; i< length;i++){
             int x = snakeBodyX[i];
             int y = snakeBodyY[i];
+            System.out.println("Snake X = " + x);
+            System.out.println("Snake Y = " + y);
+            System.out.println();
             if(i == 0){
-                System.out.println("i print head");
                 h.paintIcon(this, g, x, y);
             }
             else{
-                System.out.println("i print body");
                 b.paintIcon(this, g, x, y);
             }
         }
+        gameOver(g);
     }
 
     
     
     public void movement(){
-
-        for(int i = snakeLength-1; i > 0 ; i--){
-
-        snakeBodyX[i] = snakeBodyX[i-1];
-        snakeBodyY[i] = snakeBodyY[i-1];
+        for(int i = snakeLength; i > 0 ; i--){
+            snakeBodyX[i] = snakeBodyX[i-1];
+            snakeBodyY[i] = snakeBodyY[i-1];
         }
         if (left){
-            snakeBodyX[0] -= snakeSize;
+            snakeBodyX[0] -= 10;
         }
         else if (right){
-            snakeBodyX[0] += snakeSize;
+            snakeBodyX[0] += 10;
         }
         else if (up){
-            snakeBodyY[0] -= snakeSize;
+            snakeBodyY[0] -= 10;
         }
         else if (down){
-            snakeBodyY[0] += snakeSize;
+            snakeBodyY[0] += 10;
         }
         
     }
@@ -170,9 +166,24 @@ public class Game2 extends JPanel implements ActionListener{
         else if (snakeBodyX[0] <= 0){
             inGame = false;
         }
-        if (inGame == true){
-            System.out.println("False");
+        for(int i = 1;i<snakeLength;i++){
+            if(snakeBodyX[0] == snakeBodyX[i] && snakeBodyY[0] == snakeBodyY[i]){
+                inGame = false;
+            }
         }
+    }
+
+    private void gameOver(Graphics g) {
+        if(inGame == false){
+            String msg = "Game Over";
+            Font small = new Font("Helvetica", Font.BOLD, 14);
+            FontMetrics metr = getFontMetrics(small);
+
+            g.setColor(Color.white);
+            g.setFont(small);
+            g.drawString(msg, (400 - metr.stringWidth(msg)) / 2, 800 / 2);
+        }
+        
     }
 
     @Override
@@ -185,6 +196,7 @@ public class Game2 extends JPanel implements ActionListener{
         }
         if(!inGame){
             timer.stop();
+
         }
     }
     private class TAdapter extends KeyAdapter {
