@@ -1,6 +1,5 @@
 package ntou.cs.java2020.project;
 import javax.imageio.ImageIO;
-import ntou.cs.java2020.project.Board;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.*;
@@ -12,13 +11,17 @@ import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.*;
 import java.util.Random;
-
+import javax.swing.border.Border;
 
 
 public class Game2 extends JPanel implements ActionListener{
 
+    private boolean effect = false;
+    private boolean turtle = false;
+    private boolean rabbit = false;
     public int count = 0;
-    public int speed = 300;
+    public int speed = 200;
+    private int effectNum = 2;
 
     private int height;
     private int width;
@@ -29,10 +32,16 @@ public class Game2 extends JPanel implements ActionListener{
 
     private int appleX;
     private int appleY;
+    private int rabbitX;
+    private int rabbitY;
+    private int turtleX;
+    private int turtleY;
 
     private ImageIcon b;
     private ImageIcon h;
     private ImageIcon a;
+    private ImageIcon r;
+    private ImageIcon t;
 
     private Timer timer;
 
@@ -42,13 +51,18 @@ public class Game2 extends JPanel implements ActionListener{
     public boolean right;
     public boolean left;
 
+    public Score myScore = new Score();
+    public JLabel scoreLabel = new JLabel();
+    
+
     public Game2(){
         addKeyListener(new TAdapter());
-        
+        Border line = BorderFactory.createLineBorder(Color.white);
+        setBorder(line);
         
         setFocusable(true);
         setBackground(Color.black);
-        height = 800;
+        height = 780;
         width = 400;
         snakeLength = 5;
         snakeBodyX[0] = 300;  //head x
@@ -63,19 +77,30 @@ public class Game2 extends JPanel implements ActionListener{
         snakeBodyY[4] = 300;  //tail y
 
         LocateApple();
+        LocateRabbit();
+        LocateTurtle();
+        checkEffect();
 
         b = new ImageIcon("D:\\project\\body2.png");
         h = new ImageIcon("D:\\project\\head2.png");
-        a = new ImageIcon("D:\\project\\apple.png");
+        a = new ImageIcon("D:\\project\\apple2.png");
+        t = new ImageIcon("D:\\project\\turtle2.png");
+        r = new ImageIcon("D:\\project\\rabbit2.png");
         Image tempA = a.getImage();
         Image tempH = h.getImage();
         Image tempB = b.getImage();
+        Image tempT = t.getImage();
+        Image tempR = r.getImage();
         tempH = tempH.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
         tempB = tempB.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
         tempA = tempA.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
+        tempT = tempT.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
+        tempR = tempR.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
         h = new ImageIcon(tempH);
         b = new ImageIcon(tempB);
         a = new ImageIcon(tempA);
+        t = new ImageIcon(tempT);
+        r = new ImageIcon(tempR);
 
         timer = new Timer(speed,this);
         timer.start();
@@ -87,19 +112,87 @@ public class Game2 extends JPanel implements ActionListener{
     }   
 
     public void LocateApple(){
-        System.out.println(appleX);
-        System.out.println(appleY);
         Random rnd = new Random();
-        appleX = rnd.nextInt(40);
-        appleY = rnd.nextInt(80);
+        appleX = rnd.nextInt(39) + 1;
+        appleY = rnd.nextInt(79) + 1;
         appleX *= snakeSize;
         appleY *= snakeSize;
+    }
+
+    public void LocateRabbit(){
+        Random rnd = new Random();
+        rabbitX = rnd.nextInt(39) + 1;
+        rabbitY = rnd.nextInt(79) + 1;
+        rabbitX *= snakeSize;
+        rabbitY *= snakeSize;
+    }
+
+    public void LocateTurtle(){
+        Random rnd = new Random();
+        turtleX = rnd.nextInt(39) + 1;
+        turtleY = rnd.nextInt(79) + 1;
+        turtleX *= snakeSize;
+        turtleY *= snakeSize;
     }
     
     public void checkAppleEaten(){
         if ((snakeBodyX[0] == appleX) && (snakeBodyY[0] == appleY)){
+            effect = false;
+            rabbit = false;
+            turtle = false;
+            checkEffect();
+            randomEffect();
             LocateApple();
             snakeLength++;
+            myScore.addPoints();
+        }
+    }
+
+    public void checkRabbitEaten(){
+        if ((snakeBodyX[0] == rabbitX) && (snakeBodyY[0] == rabbitY)){
+            rabbit = false;
+            effect = false;
+            timer.stop();
+            timer = new Timer(100, this);
+            timer.start();
+        }
+    }
+
+    public void checkTurtleEaten(){
+        if ((snakeBodyX[0] == turtleX) && (snakeBodyY[0] == turtleY)){
+            turtle = false;
+            effect = false;
+            timer.stop();
+            timer = new Timer(500, this);
+            timer.start();
+        }
+    }
+
+    public void checkEffect(){ //30% random a effect
+        Random rnd = new Random();
+        int rnd_effect = rnd.nextInt(99)+1;
+        if(rnd_effect >= 30){
+            LocateRabbit();
+            LocateTurtle();
+            effect = true;
+        }
+        else{
+            effect = false;
+        }
+    }
+
+    public void randomEffect(){
+        Random rnd = new Random();
+        int rnd_effect = rnd.nextInt(effectNum);
+        if (rnd_effect == 0){
+            //turtle effect
+            turtle = true;
+            rabbit = false;
+        }
+        else if (rnd_effect == 1){
+            //rabbit effect
+            turtle = false;
+            rabbit = true;
         }
     }
 
@@ -110,17 +203,19 @@ public class Game2 extends JPanel implements ActionListener{
     }
 
     public void doDrawing(Graphics g){
-        System.out.println();
-        System.out.println("Apple X = " + appleX);
-        System.out.println("Apple Y = " + appleY);
         a.paintIcon(this, g, appleX, appleY);
+        if (effect){         
+            if(turtle){                 //turtle effect
+                t.paintIcon(this, g, turtleX, turtleY);
+            }    
+            else if(rabbit){            //rabbit effect
+                r.paintIcon(this, g, rabbitX, rabbitY);
+            }  
+        }
         int length = snakeLength;
         for(int i = 0; i< length;i++){
             int x = snakeBodyX[i];
             int y = snakeBodyY[i];
-            System.out.println("Snake X = " + x);
-            System.out.println("Snake Y = " + y);
-            System.out.println();
             if(i == 0){
                 h.paintIcon(this, g, x, y);
             }
@@ -157,13 +252,13 @@ public class Game2 extends JPanel implements ActionListener{
         if (snakeBodyY[0] >= height){
             inGame = false;
         }
-        else if (snakeBodyY[0] <= 0){
+        else if (snakeBodyY[0] < 0){
             inGame = false;
         }
         else if (snakeBodyX[0] >= width){
             inGame = false;
         }
-        else if (snakeBodyX[0] <= 0){
+        else if (snakeBodyX[0] < 0){
             inGame = false;
         }
         for(int i = 1;i<snakeLength;i++){
@@ -193,10 +288,18 @@ public class Game2 extends JPanel implements ActionListener{
             checkWall();
             repaint(); 
             checkAppleEaten();
+            scoreLabel.setText("SCORE: "+myScore.getScore());
+            if(effect){                      //if true then must draw a effect
+                if(turtle){                     //turtle effect
+                    checkTurtleEaten();
+                }                    
+                else if (rabbit){                //rabbit effect
+                    checkRabbitEaten();
+                }         
+            }
         }
         if(!inGame){
             timer.stop();
-
         }
     }
     private class TAdapter extends KeyAdapter {

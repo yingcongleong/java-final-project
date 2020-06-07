@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+
 import ntou.cs.java2020.project.Board;
 import java.io.File;
 import java.io.IOException;
@@ -17,17 +18,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 
-public class GameTest extends JFrame{
-    public GameTest(){
-        add(new Game2());
-        setTitle("this is the new new one");
-        setVisible(true);
-        setSize(800, 800);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    }
+public class GameTest{
     public static void main(String[] args) {
-        JFrame frame = new GameTest();
-        
+        MainMenu mm = new MainMenu();
         /*
         game.jf.setTitle("JF");
         game.jf.setSize(800,800);

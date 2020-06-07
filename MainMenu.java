@@ -1,5 +1,4 @@
 package ntou.cs.java2020.project;
-import java.awt.event.ActionListener;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -10,6 +9,8 @@ public class MainMenu implements ActionListener{
     private JButton start = new JButton();
     private JButton setting = new JButton();
     private JButton quit = new JButton();
+
+    private JFrame game = new JFrame();
 
     public MainMenu(){
         
@@ -33,15 +34,18 @@ public class MainMenu implements ActionListener{
     public void actionPerformed(ActionEvent e){
         JButton actionSource = (JButton) e.getSource();
         if(actionSource.equals(start)){
+            game.add(new outterLayout());
+            game.setTitle("this is one");
+            game.setVisible(true);
+            game.setSize(900, 900);
+            game.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setVisible(false);
             //do start things
-            System.out.println("START");
         }
         else if (actionSource.equals(setting)){
             //do setting thing
-            System.out.println("SETTING");
         }
         else if (actionSource.equals(quit)){
-            System.out.println("QUIT");
             frame.dispose();
         }
     }
