@@ -81,13 +81,12 @@ public class Game2 extends JPanel implements ActionListener{
         LocateRabbit();
         LocateTurtle();
         checkEffect();
-
-        b = new ImageIcon("D:\\project\\body2.png");
-        h = new ImageIcon("D:\\project\\head2.png");
-        a = new ImageIcon("D:\\project\\apple2.png");
-        t = new ImageIcon("D:\\project\\turtle2.png");
-        r = new ImageIcon("D:\\project\\rabbit2.png");
-        w = new ImageIcon("D:\\project\\wall.png");
+        b = new ImageIcon("image\\body2.png");
+        h = new ImageIcon("image\\head2.png");
+        a = new ImageIcon("image\\apple2.png");
+        t = new ImageIcon("image\\turtle2.png");
+        r = new ImageIcon("image\\rabbit2.png");
+        w = new ImageIcon("image\\wall.png");
         Image tempA = a.getImage();
         Image tempH = h.getImage();
         Image tempB = b.getImage();
@@ -178,7 +177,7 @@ public class Game2 extends JPanel implements ActionListener{
         }
     }
 
-    public void checkEffect(){ //30% random a effect
+    public void checkEffect(){ //10% random a effect
         Random rnd = new Random();
         int rnd_effect = rnd.nextInt(99)+1;
         if(rnd_effect >= 30){
